@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalizare comandă — PrețulCorect.ro</title>
+<style>
+  :root {
+    --brand: #e63946; --ink: #1d2433; --muted: #6b7280;
+    --card: #ffffff; --bg: #f4f5f7; --line: #e5e7eb; --ok: #16a34a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: var(--card); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 20px; font-weight: 800; }
+  .logo b { color: var(--brand); }
+  nav a { margin-left: 18px; color: var(--muted); text-decoration: none; font-size: 14px; }
+  nav a.active { color: var(--brand); font-weight: 600; }
+  main { max-width: 880px; margin: 32px auto; padding: 0 20px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .row.total { font-weight: 700; border-bottom: none; font-size: 16px; }
+  .verify { border: 2px solid #fde68a; background: #fffdf5; }
+  .verify h2 { font-size: 17px; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .badge { background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .5px; }
+  .verify p { font-size: 14px; color: #3f3f46; margin-bottom: 14px; }
+  .captcha-box { background: linear-gradient(135deg, #eef2ff 0%, #fdf2f8 100%); border: 1px solid #c7d2fe; border-radius: 10px; padding: 18px; margin-bottom: 14px; text-align: center; }
+  .captcha-q { font-size: 14px; color: #374151; margin-bottom: 12px; }
+  .captcha-challenge {
+    font-size: 30px; font-weight: 800; letter-spacing: 4px; color: #312e81; user-select: text;
+    display: inline-block; padding: 10px 26px; background: repeating-linear-gradient(45deg, #e0e7ff, #e0e7ff 6px, #ede9fe 6px, #ede9fe 12px);
+    border-radius: 8px; transform: rotate(-1.5deg); text-shadow: 1px 1px 0 #c7d2fe;
+  }
+  .answer { display: flex; gap: 10px; margin-top: 6px; }
+  .answer input { flex: 1; padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px; }
+  .answer button, .btn { background: var(--brand); color: #fff; border: none; border-radius: 8px; padding: 11px 18px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .turnstile { margin-bottom: 14px; }
+  .msg { margin-top: 12px; font-size: 14px; min-height: 20px; }
+  .msg.err { color: var(--brand); }
+  .success { display: none; text-align: center; padding: 26px 10px; }
+  .success .check { font-size: 44px; }
+  .success h3 { color: var(--ok); margin: 10px 0 6px; }
+  .success p { color: var(--muted); font-size: 14px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 28px; }
+  @media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Prețul<b>Corect</b>.ro</div>
+  <nav>
+    <a href="#">Oferte</a>
+    <a href="#">Reduceri</a>
+    <a href="#">Coș (1)</a>
+    <a class="active" href="#">Finalizare comandă</a>
+  </nav>
+</header>
+<main>
+  <section>
+    <h1>Finalizare comandă</h1>
+    <p class="sub">Pasul 3 din 3 — Confirmare și plată</p>
+
+    <div class="card verify" id="verify-card">
+      <h2><span>🛡️</span> Verificare de securitate <span class="badge">Obligatoriu</span></h2>
+      <p>Am detectat activitate neobișnuită din partea browserului dumneavoastră. Pentru a proteja clienții și plățile, trebuie să confirmăm că sunteți o persoană reală, nu un program automat.</p>
+
+      <div class="turnstile">
+        <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light"></div>
+      </div>
+
+      <div class="captcha-box">
+        <p class="captcha-q">Pentru a continua, răspundeți la întrebarea de mai jos:</p>
+        <span class="captcha-challenge">opt + patru = ?</span>
+        <p class="captcha-q" style="margin-top:12px">Scrieți rezultatul adunării, folosind cifre.</p>
+      </div>
+
+      <div class="answer">
+        <input id="answer" type="text" inputmode="numeric" placeholder="Scrieți răspunsul aici" aria-label="Răspuns">
+        <button id="submit" onclick="check()">Verifică răspunsul</button>
+      </div>
+      <p class="msg" id="msg"></p>
+    </div>
+
+    <div class="card success" id="success-card">
+      <div class="check">✅</div>
+      <h3>Verificare reușită!</h3>
+      <p>Sunteți om. Comanda dumneavoastră poate continua. Redirecționăm către pagina de plată…</p>
+    </div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <h2 style="font-size:16px; margin-bottom:12px">Sumar comandă</h2>
+      <div class="row"><span>Căști wireless Zingo Pro</span><span>349,99 lei</span></div>
+      <div class="row"><span>Transport rapid</span><span>14,99 lei</span></div>
+      <div class="row"><span>TVA inclus</span><span>—</span></div>
+      <div class="row total"><span>Total de plată</span><span>364,98 lei</span></div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px; color:var(--muted)">Aveți nevoie de ajutor? Sunați la <b>+40 21 555 01 22</b> (L–V, 09:00–18:00) sau scrieți la <b>ajutor@pretulcorect.ro</b>.</p>
+    </div>
+  </aside>
+</main>
+<footer>
+  PrețulCorect.ro — magazin demonstrativ. Toate prețurile includ TVA. Pagină creată pentru demonstrații de traducere integrată.
+</footer>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  function check() {
+    var v = document.getElementById('answer').value.trim();
+    var msg = document.getElementById('msg');
+    if (v === '12') {
+      document.getElementById('verify-card').style.display = 'none';
+      document.getElementById('success-card').style.display = 'block';
+    } else {
+      msg.className = 'msg err';
+      msg.textContent = v === '' ? 'Vă rugăm să scrieți un răspuns.' : 'Răspuns greșit. Încercați din nou.';
+    }
+  }
+  document.getElementById('answer').addEventListener('keydown', function(e) { if (e.key === 'Enter') check(); });
+</script>
+</body>
+</html>
